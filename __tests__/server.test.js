@@ -21,7 +21,7 @@ describe("server", () => {
   });
 });
 
-describe("Server", () => {
+describe("Posts", () => {
   it("should create a new post", async () => {
     const response = await request.post("/post").send({
       id: 1,
@@ -51,13 +51,53 @@ describe("Server", () => {
       title: "updated post",
       content: "updated content",
     });
-    expect(response.status).toEqual(200);
-    expect(response.body[0]).toEqual(1);
+    expect(response.status).toEqual(202);
+    expect(response.body.title).toEqual("updated post");
+    expect(response.body.content).toEqual("updated content");
   });
 
   it("should delete a post", async () => {
     const response = await request.delete("/post/1");
+    expect(response.status).toEqual(204);
+  });
+});
+
+// Get all posts with their comments using GET.
+// Add a new comment using POST.
+
+describe("Comments", () => {
+  it("should create a new comment", async () => {
+    const response = await request.post("/comment/10").send({
+      id: 20,
+      content: "test comment",
+    });
+    expect(response.status).toEqual(201);
+    expect(response.body.content).toEqual("test comment");
+    expect(response.body.postId).toEqual(10);
+  });
+
+  it("should get all comments", async () => {
+    const response = await request.get("/comment");
     expect(response.status).toEqual(200);
-    expect(response.body).toEqual(1);
+    expect(response.body.length).toBeGreaterThan(0);
+  });
+
+  it("should get one comment", async () => {
+    const response = await request.get("/comment/20");
+    expect(response.status).toEqual(200);
+    expect(response.body.content).toEqual("test comment");
+  });
+
+  it("should update a comment", async () => {
+    const response = await request.put("/comment/20").send({
+      content: "updated comment",
+    });
+    expect(response.status).toEqual(202);
+    expect(response.body.content).toEqual("updated comment");
+  });
+
+  it("should delete a comment", async () => {
+    const response = await request.delete("/comment/20");
+    expect(response.status).toEqual(204);
   });
 });
