@@ -4,9 +4,6 @@ const supertest = require("supertest");
 const { app } = require("../server");
 const request = supertest(app);
 
-// thrown: "Exceeded timeout of 5000 ms for a test.
-//     Use jest.setTimeout(newTimeout) to increase the timeout value, if this is a long-running test."
-
 describe("server", () => {
   it("should handle not found routes", async () => {
     const response = await request.get("/bad");
@@ -62,9 +59,6 @@ describe("Posts", () => {
   });
 });
 
-// Get all posts with their comments using GET.
-// Add a new comment using POST.
-
 describe("Comments", () => {
   it("should create a new comment", async () => {
     const response = await request.post("/comment/10").send({
@@ -99,5 +93,31 @@ describe("Comments", () => {
   it("should delete a comment", async () => {
     const response = await request.delete("/comment/20");
     expect(response.status).toEqual(204);
+  });
+});
+
+describe("Users", () => {
+  it("should create a new user", async () => {
+    const response = await request.post("/signup").send({
+      userName: "test",
+      email: "test@test.com",
+      password: "123456",
+    });
+    expect(response.status).toEqual(201);
+    expect(response.body.userName).toEqual("test");
+    expect(response.body.email).toEqual("test@test.com");
+  });
+
+  it("should get all users", async () => {
+    const response = await request.get("/users");
+    expect(response.status).toEqual(200);
+    expect(response.body.length).toBeGreaterThan(0);
+  });
+
+  it("should login", async () => {
+    const response = await request.post("/login").auth("test", "123456");
+    expect(response.status).toEqual(200);
+    expect(response.body.userName).toEqual("test");
+    expect(response.body.email).toEqual("test@test.com");
   });
 });
