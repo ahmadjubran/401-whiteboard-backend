@@ -97,15 +97,17 @@ describe("Comments", () => {
 });
 
 describe("Users", () => {
+  const random1 = Math.floor(Math.random() * 100);
+  const random2 = Math.floor(Math.random() * 100);
   it("should create a new user", async () => {
     const response = await request.post("/signup").send({
-      userName: "test",
-      email: "test@test.com",
+      userName: `${random1}test${random2}`,
+      email: `test${random1}@test${random2}.com`,
       password: "123456",
     });
     expect(response.status).toEqual(201);
-    expect(response.body.userName).toEqual("test");
-    expect(response.body.email).toEqual("test@test.com");
+    expect(response.body.userName).toEqual(`${random1}test${random2}`);
+    expect(response.body.email).toEqual(`test${random1}@test${random2}.com`);
   });
 
   it("should get all users", async () => {
@@ -115,9 +117,11 @@ describe("Users", () => {
   });
 
   it("should login", async () => {
-    const response = await request.post("/login").auth("test", "123456");
+    const response = await request
+      .post("/login")
+      .auth(`${random1}test${random2}`, "123456");
     expect(response.status).toEqual(200);
-    expect(response.body.userName).toEqual("test");
-    expect(response.body.email).toEqual("test@test.com");
+    expect(response.body.userName).toEqual(`${random1}test${random2}`);
+    expect(response.body.email).toEqual(`test${random1}@test${random2}.com`);
   });
 });
