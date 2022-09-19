@@ -22,6 +22,7 @@ const sequelizeOptions = {
 const sequelize = new Sequelize(POSTGRES_URI, sequelizeOptions);
 const postModel = post(sequelize, DataTypes);
 const commentModel = comment(sequelize, DataTypes);
+const userModel = require("./user.model")(sequelize, DataTypes);
 
 postModel.hasMany(commentModel, { foreignKey: "postId", sourceKey: "id" });
 commentModel.belongsTo(postModel, { foreignKey: "postId", targetKey: "id" });
@@ -34,4 +35,6 @@ module.exports = {
   Post: postCollection,
   Comment: commentCollection,
   CommentModel: commentModel,
+  PostModel: postModel,
+  UserModel: userModel,
 };
