@@ -60,9 +60,12 @@ describe("Posts", () => {
 });
 
 describe("Comments", () => {
+  const random1 = Math.floor(Math.random() * 100);
+  const random2 = Math.floor(Math.random() * 100);
+
   it("should create a new comment", async () => {
     const response = await request.post("/comment/10").send({
-      id: 20,
+      id: `${random1}${random2}`,
       content: "test comment",
     });
     expect(response.status).toEqual(201);
@@ -77,13 +80,13 @@ describe("Comments", () => {
   });
 
   it("should get one comment", async () => {
-    const response = await request.get("/comment/20");
+    const response = await request.get(`/comment/${random1}${random2}`);
     expect(response.status).toEqual(200);
     expect(response.body.content).toEqual("test comment");
   });
 
   it("should update a comment", async () => {
-    const response = await request.put("/comment/20").send({
+    const response = await request.put(`/comment/${random1}${random2}`).send({
       content: "updated comment",
     });
     expect(response.status).toEqual(202);
@@ -91,7 +94,7 @@ describe("Comments", () => {
   });
 
   it("should delete a comment", async () => {
-    const response = await request.delete("/comment/20");
+    const response = await request.delete(`/comment/${random1}${random2}`);
     expect(response.status).toEqual(204);
   });
 });
@@ -99,6 +102,7 @@ describe("Comments", () => {
 describe("Users", () => {
   const random1 = Math.floor(Math.random() * 100);
   const random2 = Math.floor(Math.random() * 100);
+
   it("should create a new user", async () => {
     const response = await request.post("/signup").send({
       userName: `${random1}test${random2}`,
