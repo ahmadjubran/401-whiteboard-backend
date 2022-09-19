@@ -19,9 +19,12 @@ describe("server", () => {
 });
 
 describe("Posts", () => {
+  const random1 = Math.floor(Math.random() * 100);
+  const random2 = Math.floor(Math.random() * 100);
+
   it("should create a new post", async () => {
     const response = await request.post("/post").send({
-      id: 1,
+      id: `${random1}${random2}`,
       title: "test post",
       content: "test content",
     });
@@ -37,14 +40,14 @@ describe("Posts", () => {
   });
 
   it("should get one post", async () => {
-    const response = await request.get("/post/1");
+    const response = await request.get(`/post/${random1}${random2}`);
     expect(response.status).toEqual(200);
     expect(response.body.title).toEqual("test post");
     expect(response.body.content).toEqual("test content");
   });
 
   it("should update a post", async () => {
-    const response = await request.put("/post/1").send({
+    const response = await request.put(`/post/${random1}${random2}`).send({
       title: "updated post",
       content: "updated content",
     });
@@ -54,7 +57,7 @@ describe("Posts", () => {
   });
 
   it("should delete a post", async () => {
-    const response = await request.delete("/post/1");
+    const response = await request.delete(`/post/${random1}${random2}`);
     expect(response.status).toEqual(204);
   });
 });
@@ -63,14 +66,25 @@ describe("Comments", () => {
   const random1 = Math.floor(Math.random() * 100);
   const random2 = Math.floor(Math.random() * 100);
 
+  it("should create a new post", async () => {
+    const response = await request.post("/post").send({
+      id: `${random1}${random2}`,
+      title: "test post",
+      content: "test content",
+    });
+    expect(response.status).toEqual(201);
+    expect(response.body.title).toEqual("test post");
+    expect(response.body.content).toEqual("test content");
+  });
+
   it("should create a new comment", async () => {
-    const response = await request.post("/comment/10").send({
+    const response = await request.post(`/comment/${random1}${random2}`).send({
       id: `${random1}${random2}`,
       content: "test comment",
     });
     expect(response.status).toEqual(201);
     expect(response.body.content).toEqual("test comment");
-    expect(response.body.postId).toEqual(10);
+    expect(response.body.postId).toEqual(Number(`${random1}${random2}`));
   });
 
   it("should get all comments", async () => {
@@ -95,6 +109,11 @@ describe("Comments", () => {
 
   it("should delete a comment", async () => {
     const response = await request.delete(`/comment/${random1}${random2}`);
+    expect(response.status).toEqual(204);
+  });
+
+  it("should delete a post", async () => {
+    const response = await request.delete(`/post/${random1}${random2}`);
     expect(response.status).toEqual(204);
   });
 });
