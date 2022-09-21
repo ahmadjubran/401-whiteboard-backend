@@ -7,23 +7,32 @@ const { Post, Comment, CommentModel } = require("../models/index");
 
 router.get("/post", getPost);
 router.get("/post/:id", getOnePost);
-router.post("/post", createPost);
+router.get("/post/user/:id", getPostByUser);
+router.post("/post/:userId", createPost);
 router.put("/post/:id", updatePost);
 router.delete("/post/:id", deletePost);
 
 async function getPost(req, res) {
-  let allPostComment = await Post.getPostComments(CommentModel);
-  res.status(200).json(allPostComment);
+  let allPost = await Post.getPostComments(CommentModel);
+  res.status(200).json(allPost);
 }
 
 async function getOnePost(req, res) {
   const id = req.params.id;
-  let onePost = await Post.read(id);
+  let onePost = await Post.getPostComments(CommentModel, id);
   res.status(200).json(onePost);
 }
 
+async function getPostByUser(req, res) {
+  const id = req.params.id;
+  let userPost = await Post.getPostCommentsByUserId(id, CommentModel);
+  res.status(200).json(userPost);
+}
+
 async function createPost(req, res) {
+  const userId = req.params.userId;
   let obj = req.body;
+  obj.userId = userId;
   let newPost = await Post.create(obj);
   res.status(201).json(newPost);
 }

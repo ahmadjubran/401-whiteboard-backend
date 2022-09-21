@@ -7,7 +7,7 @@ const { Comment } = require("../models/index");
 
 router.get("/comment", getComments);
 router.get("/comment/:id", getComment);
-router.post("/comment/:id", createComment);
+router.post("/comment/:userId/:postId", createComment);
 router.put("/comment/:id", updateComment);
 router.delete("/comment/:id", deleteComment);
 
@@ -23,9 +23,11 @@ async function getComment(req, res) {
 }
 
 async function createComment(req, res) {
-  const id = req.params.id;
+  const postId = req.params.postId;
+  const userId = req.params.userId;
   let obj = req.body;
-  obj.postId = id;
+  obj.userId = userId;
+  obj.postId = postId;
   let newComment = await Comment.create(obj);
   res.status(201).json(newComment);
 }

@@ -9,7 +9,7 @@ class postCommentRoutes {
     try {
       return await this.model.create(obj);
     } catch (e) {
-      console.error("ERROR", e.message);
+      console.error("Error creating data", e.message);
     }
   }
 
@@ -21,7 +21,7 @@ class postCommentRoutes {
         return await this.model.findAll();
       }
     } catch (e) {
-      console.error("ERROR", e.message);
+      console.error("Error reading data", e.message);
     }
   }
 
@@ -30,7 +30,7 @@ class postCommentRoutes {
       const dataById = await this.model.findOne({ where: { id: id } });
       return await dataById.update(obj);
     } catch (e) {
-      console.error("ERROR", e.message);
+      console.error("Error updating data", e.message);
     }
   }
 
@@ -38,17 +38,35 @@ class postCommentRoutes {
     try {
       return await this.model.destroy({ where: { id: id } });
     } catch (e) {
-      console.error("ERROR", e.message);
+      console.error("Error deleting data", e.message);
     }
   }
 
-  async getPostComments(Comment) {
+  async getPostComments(comment, id) {
+    try {
+      if (id) {
+        return await this.model.findOne({
+          where: { id: id },
+          include: comment,
+        });
+      } else {
+        return await this.model.findAll({
+          include: comment,
+        });
+      }
+    } catch (e) {
+      console.error("Error reading data", e.message);
+    }
+  }
+
+  async getPostCommentsByUserId(id, Comment) {
     try {
       return await this.model.findAll({
+        where: { userId: id },
         include: [Comment],
       });
     } catch (e) {
-      console.error("ERROR", e.message);
+      console.error("Error getting post comments by user id", e.message);
     }
   }
 }

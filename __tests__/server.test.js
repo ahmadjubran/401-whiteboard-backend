@@ -18,12 +18,12 @@ describe("server", () => {
   });
 });
 
-describe("Posts", () => {
-  const random1 = Math.floor(Math.random() * 100);
-  const random2 = Math.floor(Math.random() * 100);
+const random1 = Math.floor(Math.random() * 1000);
+const random2 = Math.floor(Math.random() * 1000);
 
+describe("Posts", () => {
   it("should create a new post", async () => {
-    const response = await request.post("/post").send({
+    const response = await request.post("/post/1").send({
       id: `${random1}${random2}`,
       title: "test post",
       content: "test content",
@@ -55,35 +55,19 @@ describe("Posts", () => {
     expect(response.body.title).toEqual("updated post");
     expect(response.body.content).toEqual("updated content");
   });
-
-  it("should delete a post", async () => {
-    const response = await request.delete(`/post/${random1}${random2}`);
-    expect(response.status).toEqual(204);
-  });
 });
 
 describe("Comments", () => {
-  const random1 = Math.floor(Math.random() * 100);
-  const random2 = Math.floor(Math.random() * 100);
-
-  it("should create a new post", async () => {
-    const response = await request.post("/post").send({
-      id: `${random1}${random2}`,
-      title: "test post",
-      content: "test content",
-    });
-    expect(response.status).toEqual(201);
-    expect(response.body.title).toEqual("test post");
-    expect(response.body.content).toEqual("test content");
-  });
-
   it("should create a new comment", async () => {
-    const response = await request.post(`/comment/${random1}${random2}`).send({
-      id: `${random1}${random2}`,
-      content: "test comment",
-    });
+    const response = await request
+      .post(`/comment/1/${random1}${random2}`)
+      .send({
+        id: `${random1}${random2}`,
+        content: "test comment",
+      });
     expect(response.status).toEqual(201);
     expect(response.body.content).toEqual("test comment");
+    expect(response.body.userId).toEqual(1);
     expect(response.body.postId).toEqual(Number(`${random1}${random2}`));
   });
 
@@ -119,32 +103,14 @@ describe("Comments", () => {
 });
 
 describe("Users", () => {
-  const random1 = Math.floor(Math.random() * 100);
-  const random2 = Math.floor(Math.random() * 100);
-
   it("should create a new user", async () => {
     const response = await request.post("/signup").send({
-      userName: `${random1}test${random2}`,
+      userName: `test${random1}${random2}`,
       email: `test${random1}@test${random2}.com`,
       password: "123456",
     });
     expect(response.status).toEqual(201);
-    expect(response.body.userName).toEqual(`${random1}test${random2}`);
-    expect(response.body.email).toEqual(`test${random1}@test${random2}.com`);
-  });
-
-  it("should get all users", async () => {
-    const response = await request.get("/users");
-    expect(response.status).toEqual(200);
-    expect(response.body.length).toBeGreaterThan(0);
-  });
-
-  it("should login", async () => {
-    const response = await request
-      .post("/login")
-      .auth(`${random1}test${random2}`, "123456");
-    expect(response.status).toEqual(200);
-    expect(response.body.userName).toEqual(`${random1}test${random2}`);
+    expect(response.body.userName).toEqual(`test${random1}${random2}`);
     expect(response.body.email).toEqual(`test${random1}@test${random2}.com`);
   });
 });
