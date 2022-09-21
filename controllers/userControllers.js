@@ -26,6 +26,7 @@ const signup = async (req, res) => {
     const output = {
       userName: user.userName,
       email: user.email,
+      id: user.id,
     };
 
     if (user) {
