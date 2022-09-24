@@ -4,10 +4,11 @@ const express = require("express");
 const router = express.Router();
 
 const { Post, Comment, CommentModel } = require("../models/index");
+const bearerAuth = require("../middlewares/bearer-auth");
 
-router.get("/post", getPost);
-router.get("/post/:id", getOnePost);
-router.get("/post/user/:id", getPostByUser);
+router.get("/post", bearerAuth, getPost);
+router.get("/post/:id", bearerAuth, getOnePost);
+router.get("/post/user/:id", bearerAuth, getPostByUser);
 router.post("/post/:userId", createPost);
 router.put("/post/:id", updatePost);
 router.delete("/post/:id", deletePost);

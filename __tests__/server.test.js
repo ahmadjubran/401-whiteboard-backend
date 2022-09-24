@@ -18,6 +18,7 @@ describe("server", () => {
   });
 });
 
+let token;
 describe("Users", () => {
   const random1 = Math.floor(Math.random() * 1000);
   const random2 = Math.floor(Math.random() * 1000);
@@ -31,6 +32,30 @@ describe("Users", () => {
     expect(response.status).toEqual(201);
     expect(response.body.userName).toEqual(`test${random1}${random2}`);
     expect(response.body.email).toEqual(`test${random1}@test${random2}.com`);
+  });
+
+  it("should login with basic", async () => {
+    const response = await request
+      .post("/login")
+      .auth(`test${random1}${random2}`, "123456");
+
+    expect(response.status).toEqual(200);
+    expect(response.body.User.userName).toEqual(`test${random1}${random2}`);
+    expect(response.body.User.email).toEqual(
+      `test${random1}@test${random2}.com`
+    );
+
+    token = response.body.token;
+  });
+
+  console.log(token);
+  it("should show all users", async () => {
+    const response = await request
+      .get("/users")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(response.status).toEqual(200);
+    expect(response.body.length).toBeGreaterThanOrEqual(1);
   });
 });
 
@@ -50,13 +75,19 @@ describe("Posts", () => {
   });
 
   it("should get all posts", async () => {
-    const response = await request.get("/post");
+    const response = await request
+      .get("/post")
+      .set({ Authorization: `Bearer ${token}` });
+
     expect(response.status).toEqual(200);
-    expect(response.body.length).toBeGreaterThan(0);
+    expect(response.body.length).toBeGreaterThanOrEqual(1);
   });
 
   it("should get one post", async () => {
-    const response = await request.get(`/post/${random1}${random2}`);
+    const response = await request.get(`/post/${random1}${random2}`).set({
+      Authorization: `Bearer ${token}`,
+    });
+
     expect(response.status).toEqual(200);
     expect(response.body.title).toEqual("test post");
     expect(response.body.content).toEqual("test content");
