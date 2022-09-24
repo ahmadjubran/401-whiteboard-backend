@@ -47,19 +47,6 @@ describe("Users", () => {
 
     token = response.body.token;
   });
-
-  it("should show all users", async () => {
-    const user = await request
-      .post("/login")
-      .auth(`test${random1}${random2}`, "123456");
-
-    const response = await request
-      .get("/users")
-      .set("Authorization", `Bearer ${user.body.token}`);
-
-    expect(response.status).toEqual(200);
-    expect(response.body.length).toBeGreaterThanOrEqual(1);
-  });
 });
 
 describe("Posts", () => {
