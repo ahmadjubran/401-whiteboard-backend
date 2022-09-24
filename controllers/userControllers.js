@@ -24,9 +24,12 @@ const signup = async (req, res) => {
     const user = await User.create(data);
 
     const output = {
-      userName: user.userName,
-      email: user.email,
-      id: user.id,
+      User: {
+        userName: user.userName,
+        email: user.email,
+        id: user.id,
+      },
+      token: user.token,
     };
 
     if (user) {
@@ -46,10 +49,15 @@ const login = async (req, res) => {
   if (user) {
     const valid = await bcrypt.compare(password, user.password);
     if (valid) {
-      return res.status(200).json({
-        User: { userName: user.userName, email: user.email, id: user.id },
+      const output = {
+        User: {
+          userName: user.userName,
+          email: user.email,
+          id: user.id,
+        },
         token: user.token,
-      });
+      };
+      return res.status(200).json(output);
     } else {
       return res.status(403).send("Invalid Login");
     }
@@ -60,7 +68,20 @@ const login = async (req, res) => {
 
 const allUser = async (req, res) => {
   const users = await User.findAll({ include: [Post, Comment] });
-  res.status(200).json(users);
+
+  const output = users.map((user) => {
+    return {
+      User: {
+        userName: user.userName,
+        email: user.email,
+        id: user.id,
+        Posts: user.Posts,
+        Comments: user.Comments,
+      },
+    };
+  });
+
+  res.status(200).json(output);
 };
 
 const oneUser = async (req, res) => {
