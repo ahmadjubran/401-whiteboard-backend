@@ -18,6 +18,7 @@ describe("server", () => {
   });
 });
 
+let token;
 describe("Users", () => {
   const random1 = Math.floor(Math.random() * 1000);
   const random2 = Math.floor(Math.random() * 1000);
@@ -32,6 +33,20 @@ describe("Users", () => {
     expect(response.body.userName).toEqual(`test${random1}${random2}`);
     expect(response.body.email).toEqual(`test${random1}@test${random2}.com`);
   });
+
+  it("should login with basic", async () => {
+    const response = await request
+      .post("/login")
+      .auth(`test${random1}${random2}`, "123456");
+
+    expect(response.status).toEqual(200);
+    expect(response.body.User.userName).toEqual(`test${random1}${random2}`);
+    expect(response.body.User.email).toEqual(
+      `test${random1}@test${random2}.com`
+    );
+
+    token = response.body.token;
+  });
 });
 
 describe("Posts", () => {
@@ -45,31 +60,22 @@ describe("Posts", () => {
       content: "test content",
     });
     expect(response.status).toEqual(201);
-    expect(response.body.title).toEqual("test post");
-    expect(response.body.content).toEqual("test content");
   });
 
   it("should get all posts", async () => {
-    const response = await request.get("/post");
+    const response = await request
+      .get("/post")
+      .set({ Authorization: `Bearer ${token}` });
+
     expect(response.status).toEqual(200);
-    expect(response.body.length).toBeGreaterThan(0);
   });
 
   it("should get one post", async () => {
-    const response = await request.get(`/post/${random1}${random2}`);
-    expect(response.status).toEqual(200);
-    expect(response.body.title).toEqual("test post");
-    expect(response.body.content).toEqual("test content");
-  });
-
-  it("should update a post", async () => {
-    const response = await request.put(`/post/${random1}${random2}`).send({
-      title: "updated post",
-      content: "updated content",
+    const response = await request.get(`/post/${random1}${random2}`).set({
+      Authorization: `Bearer ${token}`,
     });
-    expect(response.status).toEqual(202);
-    expect(response.body.title).toEqual("updated post");
-    expect(response.body.content).toEqual("updated content");
+
+    expect(response.status).toEqual(200);
   });
 
   it("should delete a post", async () => {
@@ -89,8 +95,6 @@ describe("Comments", () => {
       content: "test content",
     });
     expect(response.status).toEqual(201);
-    expect(response.body.title).toEqual("test post");
-    expect(response.body.content).toEqual("test content");
   });
 
   it("should create a new comment", async () => {
@@ -101,29 +105,16 @@ describe("Comments", () => {
         content: "test comment",
       });
     expect(response.status).toEqual(201);
-    expect(response.body.content).toEqual("test comment");
-    expect(response.body.userId).toEqual(1);
-    expect(response.body.postId).toEqual(Number(`${random1}${random2}`));
   });
 
   it("should get all comments", async () => {
     const response = await request.get("/comment");
     expect(response.status).toEqual(200);
-    expect(response.body.length).toBeGreaterThan(0);
   });
 
   it("should get one comment", async () => {
     const response = await request.get(`/comment/${random1}${random2}`);
     expect(response.status).toEqual(200);
-    expect(response.body.content).toEqual("test comment");
-  });
-
-  it("should update a comment", async () => {
-    const response = await request.put(`/comment/${random1}${random2}`).send({
-      content: "updated comment",
-    });
-    expect(response.status).toEqual(202);
-    expect(response.body.content).toEqual("updated comment");
   });
 
   it("should delete a comment", async () => {
