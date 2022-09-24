@@ -11,7 +11,6 @@ on:
     
 env:
   DATABASE_URL: postgres://dcngvkljtgunsa:185818b99318a7dc93b3efd2fecc5b564617ad09af7027f9c26934f1e770b84c@ec2-52-30-75-37.eu-west-1.compute.amazonaws.com:5432/d77annjjsfrhg3
-  JWT_SECRET: 1234
 
 jobs:
   build:
