@@ -48,11 +48,14 @@ describe("Users", () => {
     token = response.body.token;
   });
 
-  console.log(token);
   it("should show all users", async () => {
+    const user = await request
+      .post("/login")
+      .auth(`test${random1}${random2}`, "123456");
+
     const response = await request
       .get("/users")
-      .set("Authorization", `Bearer ${token}`);
+      .set("Authorization", `Bearer ${user.body.token}`);
 
     expect(response.status).toEqual(200);
     expect(response.body.length).toBeGreaterThanOrEqual(1);
@@ -86,14 +89,6 @@ describe("Posts", () => {
     });
 
     expect(response.status).toEqual(200);
-  });
-
-  it("should update a post", async () => {
-    const response = await request.put(`/post/${random1}${random2}`).send({
-      title: "updated post",
-      content: "updated content",
-    });
-    expect(response.status).toEqual(202);
   });
 
   it("should delete a post", async () => {
@@ -133,13 +128,6 @@ describe("Comments", () => {
   it("should get one comment", async () => {
     const response = await request.get(`/comment/${random1}${random2}`);
     expect(response.status).toEqual(200);
-  });
-
-  it("should update a comment", async () => {
-    const response = await request.put(`/comment/${random1}${random2}`).send({
-      content: "updated comment",
-    });
-    expect(response.status).toEqual(202);
   });
 
   it("should delete a comment", async () => {
