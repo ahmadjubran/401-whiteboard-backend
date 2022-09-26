@@ -5,13 +5,14 @@ const router = express.Router();
 
 const { Post, Comment, CommentModel } = require("../models/index");
 const bearerAuth = require("../middlewares/bearer-auth");
+const acl = require("../middlewares/ACL");
 
-router.get("/post", bearerAuth, getPost);
-router.get("/post/:id", bearerAuth, getOnePost);
-router.get("/post/user/:id", bearerAuth, getPostByUser);
-router.post("/post/:userId", createPost);
-router.put("/post/:id", updatePost);
-router.delete("/post/:id", deletePost);
+router.get("/post", bearerAuth, acl("read"), getPost);
+router.get("/post/:id", bearerAuth, acl("read"), getOnePost);
+router.get("/post/user/:id", bearerAuth, acl("read"), getPostByUser);
+router.post("/post/:userId", bearerAuth, acl("create"), createPost);
+router.put("/post/:id", bearerAuth, acl("update"), updatePost);
+router.delete("/post/:id", bearerAuth, acl("delete"), deletePost);
 
 async function getPost(req, res) {
   let allPost = await Post.getPostComments(CommentModel);
