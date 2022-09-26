@@ -8,10 +8,9 @@ const Comment = require("../models").CommentModel;
 
 const signup = async (req, res) => {
   try {
-    const { userName, email, password } = req.body;
+    const { userName, email, password, role } = req.body;
 
-    const valid = isUserNameValid(userName);
-    if (!valid) {
+    if (!isUserNameValid(userName)) {
       return res.status(400).send("Username is not valid");
     }
 
@@ -19,6 +18,7 @@ const signup = async (req, res) => {
       userName,
       email,
       password: await bcrypt.hash(password, 10),
+      role,
     };
 
     const user = await User.create(data);
@@ -28,6 +28,8 @@ const signup = async (req, res) => {
         userName: user.userName,
         email: user.email,
         id: user.id,
+        role: user.role,
+        capabilities: user.capabilities,
       },
       token: user.token,
     };
@@ -54,6 +56,8 @@ const login = async (req, res) => {
           userName: user.userName,
           email: user.email,
           id: user.id,
+          role: user.role,
+          capabilities: user.capabilities,
         },
         token: user.token,
       };
@@ -75,6 +79,8 @@ const allUser = async (req, res) => {
         userName: user.userName,
         email: user.email,
         id: user.id,
+        role: user.role,
+        capabilities: user.capabilities,
         Posts: user.Posts,
         Comments: user.Comments,
       },

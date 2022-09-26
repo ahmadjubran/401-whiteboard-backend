@@ -27,6 +27,21 @@ module.exports = (sequelize, DataTypes) => {
         return jwt.sign(tokenObj, "ahmad");
       },
     },
+    role: {
+      type: DataTypes.ENUM("admin", "user"),
+      allowNull: false,
+      defaultValue: "user",
+    },
+    capabilities: {
+      type: DataTypes.VIRTUAL,
+      get: function () {
+        const acl = {
+          admin: ["read", "create", "delete", "update"],
+          user: ["read", "create"],
+        };
+        return acl[this.role];
+      },
+    },
   });
 
   User.authenticateToken = function (token) {
