@@ -36,8 +36,8 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.VIRTUAL,
       get: function () {
         const acl = {
-          admin: ["read", "create", "delete", "update"],
-          user: ["read", "create"],
+          admin: ["read", "create", "update", "delete"],
+          user: ["read", "create", "update", "delete"],
         };
         return acl[this.role];
       },
