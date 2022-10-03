@@ -130,20 +130,6 @@ describe("Posts", () => {
     expect(response.body.title).toEqual("test post");
   });
 
-  it("should not update a post", async () => {
-    const response = await request
-      .put(`/post/${postId}`)
-      .send({
-        title: "test post updated",
-        content: "test content updated",
-      })
-      .set({
-        Authorization: `Bearer ${userToken}`,
-      });
-
-    expect(response.status).toEqual(500);
-  });
-
   it("should update a post", async () => {
     const response = await request
       .put(`/post/${postId}`)
@@ -194,14 +180,6 @@ describe("Comments", () => {
   it("should delete a comment", async () => {
     const response = await request.delete(`/comment/${commentId}`);
     expect(response.status).toEqual(204);
-  });
-
-  it("should not delete a post", async () => {
-    const response = await request.delete(`/post/${postId}`).set({
-      Authorization: `Bearer ${userToken}`,
-    });
-
-    expect(response.status).toEqual(500);
   });
 
   it("should delete a post", async () => {
