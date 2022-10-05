@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
       get: function () {
         const acl = {
           admin: ["read", "create", "update", "delete"],
-          user: ["read", "create", "update", "delete"],
+          user: ["read", "create"],
         };
         return acl[this.role];
       },

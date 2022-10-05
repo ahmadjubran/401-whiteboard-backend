@@ -8,8 +8,11 @@ const random1 = Math.floor(Math.random() * 1000);
 const random2 = Math.floor(Math.random() * 1000);
 
 let adminToken;
+let adminId;
 let userToken;
-let postId;
+let userId;
+let adminPostId;
+let userPostId;
 let commentId;
 
 describe("server", () => {
@@ -69,6 +72,7 @@ describe("Users", () => {
     );
 
     adminToken = response.body.token;
+    adminId = response.body.User.id;
   });
 
   it("should login a user", async () => {
@@ -83,6 +87,7 @@ describe("Users", () => {
     );
 
     userToken = response.body.token;
+    userId = response.body.User.id;
   });
 
   it("should get users info", async () => {
@@ -98,7 +103,7 @@ describe("Users", () => {
 describe("Posts", () => {
   it("should create a new post", async () => {
     const response = await request
-      .post(`/post/1`)
+      .post(`/post/${adminId}`)
       .send({
         title: "test post",
         content: "test content",
@@ -109,7 +114,23 @@ describe("Posts", () => {
     expect(response.body.title).toEqual("test post");
     expect(response.body.content).toEqual("test content");
 
-    postId = response.body.id;
+    adminPostId = response.body.id;
+  });
+
+  it("should create another new post", async () => {
+    const response = await request
+      .post(`/post/${userId}`)
+      .send({
+        title: "test post",
+        content: "test content",
+      })
+      .set("Authorization", `Bearer ${userToken}`);
+
+    expect(response.status).toEqual(201);
+    expect(response.body.title).toEqual("test post");
+    expect(response.body.content).toEqual("test content");
+
+    userPostId = response.body.id;
   });
 
   it("should get all posts", async () => {
@@ -122,7 +143,7 @@ describe("Posts", () => {
   });
 
   it("should get one post", async () => {
-    const response = await request.get(`/post/${postId}`).set({
+    const response = await request.get(`/post/${adminPostId}`).set({
       Authorization: `Bearer ${adminToken}`,
     });
 
@@ -130,9 +151,38 @@ describe("Posts", () => {
     expect(response.body.title).toEqual("test post");
   });
 
-  it("should update a post", async () => {
+  it("should update a post by user who created it", async () => {
     const response = await request
-      .put(`/post/${postId}`)
+      .put(`/post/${userPostId}`)
+      .send({
+        title: "test post updated",
+        content: "test content updated",
+      })
+      .set({
+        Authorization: `Bearer ${adminToken}`,
+      });
+    expect(response.status).toEqual(202);
+    expect(response.body.title).toEqual("test post updated");
+    expect(response.body.content).toEqual("test content updated");
+  });
+
+  it("should not update a post by user who didn't create it", async () => {
+    const response = await request
+      .put(`/post/${adminPostId}`)
+      .send({
+        title: "test post updated",
+        content: "test content updated",
+      })
+      .set({
+        Authorization: `Bearer ${userToken}`,
+      });
+
+    expect(response.status).toEqual(500);
+  });
+
+  it("should update a post by admin even if he didn't create it", async () => {
+    const response = await request
+      .put(`/post/${userPostId}`)
       .send({
         title: "test post updated",
         content: "test content updated",
@@ -148,7 +198,7 @@ describe("Posts", () => {
 
 describe("Comments", () => {
   it("should create a new comment", async () => {
-    const response = await request.post(`/comment/1/${postId}`).send({
+    const response = await request.post(`/comment/1/${adminPostId}`).send({
       content: "test comment",
     });
     expect(response.status).toEqual(201);
@@ -182,8 +232,24 @@ describe("Comments", () => {
     expect(response.status).toEqual(204);
   });
 
+  it("should not delete a post if user is not the author", async () => {
+    const response = await request.delete(`/post/${adminPostId}`).set({
+      Authorization: `Bearer ${userToken}`,
+    });
+
+    expect(response.status).toEqual(500);
+  });
+
+  it("should delete a post if user is the author", async () => {
+    const response = await request.delete(`/post/${userPostId}`).set({
+      Authorization: `Bearer ${userToken}`,
+    });
+
+    expect(response.status).toEqual(204);
+  });
+
   it("should delete a post", async () => {
-    const response = await request.delete(`/post/${postId}`).set({
+    const response = await request.delete(`/post/${adminPostId}`).set({
       Authorization: `Bearer ${adminToken}`,
     });
 
