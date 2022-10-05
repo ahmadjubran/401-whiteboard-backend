@@ -159,7 +159,7 @@ describe("Posts", () => {
         content: "test content updated",
       })
       .set({
-        Authorization: `Bearer ${adminToken}`,
+        Authorization: `Bearer ${userToken}`,
       });
     expect(response.status).toEqual(202);
     expect(response.body.title).toEqual("test post updated");
