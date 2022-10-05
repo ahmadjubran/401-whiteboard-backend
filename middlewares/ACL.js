@@ -1,9 +1,15 @@
 "use strict";
 
+const { Post } = require("../models/index");
+
 const acl = (capability) => {
-  return (req, res, next) => {
+  return async (req, res, next) => {
     try {
-      if (req.user.capabilities.includes(capability)) {
+      let foundPost = await Post.read(req.params.id);
+      if (
+        req.user.capabilities.includes(capability) ||
+        req.user.id === foundPost.userId
+      ) {
         next();
       } else {
         next("Access Denied");
