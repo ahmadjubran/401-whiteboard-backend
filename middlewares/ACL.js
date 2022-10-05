@@ -5,14 +5,15 @@ const { Post } = require("../models/index");
 const acl = (capability) => {
   return async (req, res, next) => {
     try {
-      let foundPost = await Post.read(req.params.id);
-      if (
-        req.user.capabilities.includes(capability) ||
-        req.user.id === foundPost.userId
-      ) {
-        next();
-      } else {
+      if (!req.user.capabilities.includes(capability) && !req.user.id) {
         next("Access Denied");
+      }
+      if (req.user.capabilities.includes(capability)) {
+        next();
+      }
+      if (req.params.id) {
+        const post = await Post.read(req.params.id);
+        post.userId === req.user.id ? next() : next("Access Denied");
       }
     } catch (e) {
       next("Invalid Login");
