@@ -44,13 +44,17 @@ async function updatePost(req, res) {
   let obj = req.body;
   let foundPost = await Post.read(id);
   let updatedPost = await foundPost.update(obj);
-  res.status(202).json(updatedPost);
+  try {
+    res.status(202).json(updatedPost);
+  } catch (e) {
+    res.status(500).send("Server Error");
+  }
 }
 
 async function deletePost(req, res) {
   const id = req.params.id;
   let deletedPost = await Post.delete(id);
-  res.status(204).json(deletedPost);
+  res.status(204).send("Post Deleted");
 }
 
 module.exports = router;
