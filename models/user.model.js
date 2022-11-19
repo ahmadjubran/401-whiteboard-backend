@@ -21,10 +21,10 @@ module.exports = (sequelize, DataTypes) => {
     token: {
       type: DataTypes.VIRTUAL,
       get: function () {
-        return jwt.sign({ userName: this.userName }, "ahmad");
+        return jwt.sign({ userName: this.userName }, process.env.JWT_SECRET);
       },
       set(tokenObj) {
-        return jwt.sign(tokenObj, "ahmad");
+        return jwt.sign(tokenObj, process.env.JWT_SECRET);
       },
     },
     role: {
@@ -45,7 +45,7 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   User.authenticateToken = function (token) {
-    return jwt.verify(token, "ahmad", (err, validUser) => {
+    return jwt.verify(token, process.env.JWT_SECRET, (err, validUser) => {
       if (err) {
         throw new Error("Invalid Login");
       }
