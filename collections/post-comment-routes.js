@@ -42,17 +42,30 @@ class postCommentRoutes {
     }
   }
 
-  async getPostComments(comment, id) {
+  async getPostComments(user, comment, id) {
     try {
+      const exclude = ["password", "email", "role", "token"];
+
       if (id) {
         return await this.model.findOne({
           where: { id: id },
-          include: comment,
+          include: [
+            { model: user, attributes: { exclude: exclude } },
+            { model: comment, include: { model: user, attributes: { exclude: exclude } } },
+          ],
         });
       } else {
-        return await this.model.findAll({
-          include: comment,
+        const allPost = await this.model.findAll({
+          include: [
+            { model: user, attributes: { exclude: exclude } },
+            { model: comment, include: { model: user, attributes: { exclude: exclude } } },
+          ],
         });
+
+        const sortedPost = allPost.sort((a, b) => {
+          return b.id - a.id;
+        });
+        return sortedPost;
       }
     } catch (e) {
       console.error("Error reading data", e.message);

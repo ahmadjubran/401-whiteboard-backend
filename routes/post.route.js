@@ -3,7 +3,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { Post, Comment, CommentModel } = require("../models/index");
+const { Post, CommentModel, UserModel } = require("../models/index");
 const bearerAuth = require("../middlewares/bearer-auth");
 const acl = require("../middlewares/ACL");
 
@@ -15,13 +15,13 @@ router.put("/post/:id", bearerAuth, acl("update"), updatePost);
 router.delete("/post/:id", bearerAuth, acl("delete"), deletePost);
 
 async function getPost(req, res) {
-  let allPost = await Post.getPostComments(CommentModel);
+  let allPost = await Post.getPostComments(UserModel, CommentModel);
   res.status(200).json(allPost);
 }
 
 async function getOnePost(req, res) {
   const id = req.params.id;
-  let onePost = await Post.getPostComments(CommentModel, id);
+  let onePost = await Post.getPostComments(UserModel, CommentModel, id);
   res.status(200).json(onePost);
 }
 
