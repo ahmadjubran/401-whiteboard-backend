@@ -40,9 +40,7 @@ describe("Users", () => {
 
     expect(response.status).toEqual(201);
     expect(response.body.User.userName).toEqual(`test${random1}${random2}`);
-    expect(response.body.User.email).toEqual(
-      `test${random1}@test${random2}.com`
-    );
+    expect(response.body.User.email).toEqual(`test${random1}@test${random2}.com`);
   });
 
   it("should create a user", async () => {
@@ -55,45 +53,33 @@ describe("Users", () => {
 
     expect(response.status).toEqual(201);
     expect(response.body.User.userName).toEqual(`test${random2}${random1}`);
-    expect(response.body.User.email).toEqual(
-      `test${random2}@test${random1}.com`
-    );
+    expect(response.body.User.email).toEqual(`test${random2}@test${random1}.com`);
   });
 
   it("should login an admin", async () => {
-    const response = await request
-      .post("/login")
-      .auth(`test${random1}${random2}`, "123456");
+    const response = await request.post("/login").auth(`test${random1}${random2}`, "123456");
 
     expect(response.status).toEqual(200);
     expect(response.body.User.userName).toEqual(`test${random1}${random2}`);
-    expect(response.body.User.email).toEqual(
-      `test${random1}@test${random2}.com`
-    );
+    expect(response.body.User.email).toEqual(`test${random1}@test${random2}.com`);
 
     adminToken = response.body.token;
     adminId = response.body.User.id;
   });
 
   it("should login a user", async () => {
-    const response = await request
-      .post("/login")
-      .auth(`test${random2}${random1}`, "123456");
+    const response = await request.post("/login").auth(`test${random2}${random1}`, "123456");
 
     expect(response.status).toEqual(200);
     expect(response.body.User.userName).toEqual(`test${random2}${random1}`);
-    expect(response.body.User.email).toEqual(
-      `test${random2}@test${random1}.com`
-    );
+    expect(response.body.User.email).toEqual(`test${random2}@test${random1}.com`);
 
     userToken = response.body.token;
     userId = response.body.User.id;
   });
 
   it("should get users info", async () => {
-    const response = await request
-      .get("/users")
-      .set("Authorization", `Bearer ${adminToken}`);
+    const response = await request.get("/users").set("Authorization", `Bearer ${adminToken}`);
 
     expect(response.status).toEqual(200);
     expect(response.body.length).toBeGreaterThan(0);
@@ -134,9 +120,7 @@ describe("Posts", () => {
   });
 
   it("should get all posts", async () => {
-    const response = await request
-      .get("/post")
-      .set({ Authorization: `Bearer ${adminToken}` });
+    const response = await request.get("/post").set({ Authorization: `Bearer ${adminToken}` });
 
     expect(response.status).toEqual(200);
     expect(response.body.length).toBeGreaterThan(0);
