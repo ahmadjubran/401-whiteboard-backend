@@ -5,17 +5,16 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
-    
+    branches: ["main"]
+
 env:
   DATABASE_URL: postgres://dcngvkljtgunsa:185818b99318a7dc93b3efd2fecc5b564617ad09af7027f9c26934f1e770b84c@ec2-52-30-75-37.eu-west-1.compute.amazonaws.com:5432/d77annjjsfrhg3
   JWT_SECRET: ahmad
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -24,12 +23,12 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: npm test
