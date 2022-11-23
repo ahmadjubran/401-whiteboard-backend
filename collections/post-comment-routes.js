@@ -42,7 +42,7 @@ class postCommentRoutes {
     }
   }
 
-  async getPostComments(user, comment, id) {
+  async getPostComments(user, comment, vote, id) {
     try {
       const exclude = ["password", "email", "role", "token"];
 
@@ -51,21 +51,24 @@ class postCommentRoutes {
           where: { id: id },
           include: [
             { model: user, attributes: { exclude: exclude } },
-            { model: comment, include: { model: user, attributes: { exclude: exclude } } },
+            { model: comment, include: [{ model: user, attributes: { exclude: exclude } }] },
+            { model: vote, include: [{ model: user, attributes: { exclude: exclude } }] },
           ],
         });
       } else {
         const allPost = await this.model.findAll({
           include: [
-            { model: user, attributes: { exclude: exclude } },
-            { model: comment, include: { model: user, attributes: { exclude: exclude } } },
+            { model: user, attributes: { exclude } },
+            { model: comment, include: [{ model: user, attributes: { exclude } }] },
+            { model: vote, include: [{ model: user, attributes: { exclude } }] },
+          ],
+          order: [
+            ["createdAt", "DESC"],
+            [{ model: comment }, "createdAt", "DESC"],
           ],
         });
 
-        const sortedPost = allPost.sort((a, b) => {
-          return b.id - a.id;
-        });
-        return sortedPost;
+        return allPost;
       }
     } catch (e) {
       console.error("Error reading data", e.message);
@@ -80,6 +83,61 @@ class postCommentRoutes {
       });
     } catch (e) {
       console.error("Error getting post comments by user id", e.message);
+    }
+  }
+
+  async createPost(obj, user, comment, vote) {
+    try {
+      const exclude = ["password", "email", "role", "token"];
+
+      const newPost = await this.model.create(obj);
+      const post = await this.model.findOne({
+        where: { id: newPost.id },
+        include: [
+          { model: user, attributes: { exclude } },
+          { model: comment, include: [{ model: user, attributes: { exclude } }] },
+          { model: vote, include: [{ model: user, attributes: { exclude } }] },
+        ],
+      });
+
+      return post;
+    } catch (e) {
+      console.error("Error creating post", e.message);
+    }
+  }
+
+  async updatePost(id, obj, user, comment, vote) {
+    try {
+      const exclude = ["password", "email", "role", "token"];
+
+      const post = await this.model.findOne({ where: { id: id } });
+      const updatedPost = await post.update(obj);
+      const updatedPostWithUser = await this.model.findOne({
+        where: { id: updatedPost.id },
+        include: [
+          { model: user, attributes: { exclude } },
+          { model: comment, include: [{ model: user, attributes: { exclude } }] },
+          { model: vote, include: [{ model: user, attributes: { exclude } }] },
+        ],
+      });
+
+      return updatedPostWithUser;
+    } catch (e) {
+      console.error("Error updating post", e.message);
+    }
+  }
+
+  async getPostVotes(postId) {
+    try {
+      const postVotes = await this.model.findAll({
+        where: { postId: postId },
+      });
+      const upVotes = postVotes.filter((vote) => vote.voteType === "up");
+      const downVotes = postVotes.filter((vote) => vote.voteType === "down");
+      const totalVotes = upVotes.length - downVotes.length;
+      return { upVotes, downVotes, totalVotes };
+    } catch (e) {
+      console.error("Error getting post votes", e.message);
     }
   }
 }

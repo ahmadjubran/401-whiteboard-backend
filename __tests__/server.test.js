@@ -34,48 +34,48 @@ describe("Users", () => {
     const response = await request.post("/signup").send({
       userName: `test${random1}${random2}`,
       email: `test${random1}@test${random2}.com`,
-      password: "123456",
+      password: "abcdABCD1234!@#$",
       role: "admin",
     });
 
     expect(response.status).toEqual(201);
-    expect(response.body.User.userName).toEqual(`test${random1}${random2}`);
-    expect(response.body.User.email).toEqual(`test${random1}@test${random2}.com`);
+    expect(response.body.user.userName).toEqual(`test${random1}${random2}`);
+    expect(response.body.user.email).toEqual(`test${random1}@test${random2}.com`);
   });
 
   it("should create a user", async () => {
     const response = await request.post("/signup").send({
       userName: `test${random2}${random1}`,
       email: `test${random2}@test${random1}.com`,
-      password: "123456",
+      password: "abcdABCD1234!@#$",
       role: "user",
     });
 
     expect(response.status).toEqual(201);
-    expect(response.body.User.userName).toEqual(`test${random2}${random1}`);
-    expect(response.body.User.email).toEqual(`test${random2}@test${random1}.com`);
+    expect(response.body.user.userName).toEqual(`test${random2}${random1}`);
+    expect(response.body.user.email).toEqual(`test${random2}@test${random1}.com`);
   });
 
   it("should login an admin", async () => {
-    const response = await request.post("/login").auth(`test${random1}${random2}`, "123456");
+    const response = await request.post("/login").auth(`test${random1}${random2}`, "abcdABCD1234!@#$");
 
     expect(response.status).toEqual(200);
-    expect(response.body.User.userName).toEqual(`test${random1}${random2}`);
-    expect(response.body.User.email).toEqual(`test${random1}@test${random2}.com`);
+    expect(response.body.user.userName).toEqual(`test${random1}${random2}`);
+    expect(response.body.user.email).toEqual(`test${random1}@test${random2}.com`);
 
     adminToken = response.body.token;
-    adminId = response.body.User.id;
+    adminId = response.body.user.id;
   });
 
   it("should login a user", async () => {
-    const response = await request.post("/login").auth(`test${random2}${random1}`, "123456");
+    const response = await request.post("/login").auth(`test${random2}${random1}`, "abcdABCD1234!@#$");
 
     expect(response.status).toEqual(200);
-    expect(response.body.User.userName).toEqual(`test${random2}${random1}`);
-    expect(response.body.User.email).toEqual(`test${random2}@test${random1}.com`);
+    expect(response.body.user.userName).toEqual(`test${random2}${random1}`);
+    expect(response.body.user.email).toEqual(`test${random2}@test${random1}.com`);
 
     userToken = response.body.token;
-    userId = response.body.User.id;
+    userId = response.body.user.id;
   });
 
   it("should get users info", async () => {

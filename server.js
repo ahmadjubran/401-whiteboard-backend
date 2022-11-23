@@ -6,6 +6,7 @@ const app = express();
 
 const postRouter = require("./routes/post.route");
 const commentRouter = require("./routes/comment.route");
+const voteRouter = require("./routes/vote.route");
 const userRouter = require("./routes/user.route");
 
 const notFoundHandler = require("./error-handlers/404");
@@ -16,6 +17,7 @@ app.use(express.json());
 
 app.use(postRouter);
 app.use(commentRouter);
+app.use(voteRouter);
 app.use(userRouter);
 
 app.get("/", (req, res) => {

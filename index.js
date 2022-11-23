@@ -4,7 +4,7 @@ require("dotenv").config();
 const server = require("./server");
 const { db } = require("./models/index");
 
-db.sync()
+db.sync({ force: false })
   .then(() => {
     server.start(process.env.PORT || 3003);
   })

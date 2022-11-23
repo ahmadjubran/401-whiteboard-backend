@@ -5,6 +5,7 @@ const base64 = require("base-64");
 const User = require("../models").UserModel;
 const Post = require("../models").PostModel;
 const Comment = require("../models").CommentModel;
+const { Op } = require("sequelize");
 
 const signup = async (req, res) => {
   try {
@@ -12,6 +13,12 @@ const signup = async (req, res) => {
 
     if (!isUserNameValid(userName)) {
       return res.status(400).send("Username is not valid");
+    }
+    if (!isEmailValid(email)) {
+      return res.status(400).send("Email is not valid");
+    }
+    if (!isPasswordValid(password)) {
+      return res.status(400).send("Password is not valid");
     }
 
     const data = {
@@ -24,7 +31,7 @@ const signup = async (req, res) => {
     const user = await User.create(data);
 
     const output = {
-      User: {
+      user: {
         userName: user.userName,
         email: user.email,
         id: user.id,
@@ -45,14 +52,14 @@ const signup = async (req, res) => {
 const login = async (req, res) => {
   const basicHeader = req.headers.authorization.split(" ");
   const decoded = base64.decode(basicHeader[1]);
-  const [userName, password] = decoded.split(":");
-  const user = await User.findOne({ where: { userName: userName } });
+  const [loginData, password] = decoded.split(":");
+  const user = await User.findOne({ where: { [Op.or]: [{ userName: loginData }, { email: loginData }] } });
 
   if (user) {
     const valid = await bcrypt.compare(password, user.password);
     if (valid) {
       const output = {
-        User: {
+        user: {
           userName: user.userName,
           email: user.email,
           id: user.id,
@@ -75,7 +82,7 @@ const allUser = async (req, res) => {
 
   const output = users.map((user) => {
     return {
-      User: {
+      user: {
         userName: user.userName,
         email: user.email,
         id: user.id,
@@ -99,18 +106,21 @@ const oneUser = async (req, res) => {
 };
 
 function isUserNameValid(username) {
-  /* 
-    Usernames can only have: 
-    - Lowercase and uppercase letters
-    - First character must be a letter
-    - From 3 to 20 characters
-    - Numbers
-    - Underscores
-    - Dots (.)
-    - Dashes (-)
-    - No spaces
-  */
   const regex = username.match(/^[a-zA-Z][a-zA-Z0-9._-]{2,19}$/);
+  const valid = regex ? true : false;
+  return valid;
+}
+
+function isEmailValid(email) {
+  const regex = email.match(
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  );
+  const valid = regex ? true : false;
+  return valid;
+}
+
+function isPasswordValid(password) {
+  const regex = password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/);
   const valid = regex ? true : false;
   return valid;
 }
